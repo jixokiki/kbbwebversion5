@@ -423,197 +423,489 @@
 
 // export default Purchase;
 
+//code sebelumnya
+// "use client";
+// import useAuth from "@/app/hooks/useAuth";
+// import Footer from "@/components/Footer";
+// import Navbar from "@/components/Navbar";
+// import NavbarAdmin from "@/components/NavbarAdmin";
+// import { db, storage } from "@/firebase/firebase";
+// import {
+//   collection,
+//   doc,
+//   onSnapshot,
+//   serverTimestamp,
+//   setDoc,
+//   updateDoc,
+//   query,
+//   where,
+//   getDocs,
+// } from "firebase/firestore";
+// import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+// import { useRouter } from "next/navigation";
+// import React, { useEffect, useState } from "react";
+
+// const Purchase = () => {
+//   const { user, userProfile } = useAuth();
+//   const router = useRouter();
+
+//   useEffect(() => {
+//     if (user && userProfile.role === "user") {
+//       router.push("/");
+//     }
+//   }, [user, userProfile, router]);
+
+//   const [file, setFile] = useState(null);
+//   const [percentage, setPercentage] = useState(null);
+//   const [data, setData] = useState([]);
+//   const [namaProduct, setNamaProduct] = useState(""); // State untuk nama produk
+//   const [address, setAddress] = useState(""); // State untuk alamat pengiriman
+//   const [selectedItems, setSelectedItems] = useState([]); // State untuk menyimpan item yang dipilih
+
+//   useEffect(() => {
+//     const unsub = onSnapshot(
+//       collection(db, "userRequestOrder"),
+//       (snapshot) => {
+//         let list = [];
+//         snapshot.docs.forEach((doc) => {
+//           list.push({ id: doc.id, ref: doc.ref, ...doc.data() });
+//         });
+//         setData(list);
+
+//         // Set nilai awal untuk nama produk dan alamat berdasarkan data pertama dari snapshot
+//         if (list.length > 0) {
+//           setNamaProduct(list[0].namaProduct || ""); // Mengambil nilai nama produk
+//           setAddress(list[0].address || ""); // Mengambil nilai alamat pengiriman
+//         }
+//       },
+//       (error) => {
+//         console.log(error);
+//       }
+//     );
+
+//     return () => {
+//       unsub();
+//     };
+//   }, []);
+
+//   const handleCheckboxChange = (itemId) => {
+//     const selectedIndex = selectedItems.indexOf(itemId);
+//     let newSelected = [];
+
+//     if (selectedIndex === -1) {
+//       newSelected = newSelected.concat(selectedItems, itemId);
+//     } else if (selectedIndex === 0) {
+//       newSelected = newSelected.concat(selectedItems.slice(1));
+//     } else if (selectedIndex === selectedItems.length - 1) {
+//       newSelected = newSelected.concat(selectedItems.slice(0, -1));
+//     } else if (selectedIndex > 0) {
+//       newSelected = newSelected.concat(
+//         selectedItems.slice(0, selectedIndex),
+//         selectedItems.slice(selectedIndex + 1)
+//       );
+//     }
+
+//     setSelectedItems(newSelected);
+//   };
+
+//   const handleSendToGudang = async (e) => {
+//     e.preventDefault();
+
+//     try {
+//       // Update status for selected items
+//       for (const itemId of selectedItems) {
+//         const selectedData = data.find((item) => item.id === itemId);
+
+//         if (selectedData) {
+//           await updateDoc(selectedData.ref, {
+//             status: "pengecekan stock",
+//           });
+//         }
+//       }
+
+//       alert("Status updated to pengecekan stock!");
+//       setSelectedItems([]);
+//     } catch (error) {
+//       console.error("Error updating status:", error);
+//     }
+//   };
+
+//   return (
+//     <div className="w-[100%] mx-auto mt-32">
+//       <NavbarAdmin />
+//       <div className="w-[90%] mx-auto mt-10">
+//         <h2 className="text-2xl font-semibold mb-4">Pesanan</h2>
+//         <table className="table-auto w-full">
+//           <thead>
+//             <tr>
+//               <th>Pilih</th>
+//               <th>Nama Beras</th>
+//               <th>Alamat Pengiriman</th>
+//               <th>Kontak</th>
+//               <th>Kategori Kemasan</th>
+//               <th>Jumlah Kemasan</th>
+//               <th>Harga</th>
+//               <th>Tanggal Kirim</th>
+//               <th>Status</th>
+//               <th>Tanggal Pemesanan</th>
+//             </tr>
+//           </thead>
+//           <tbody>
+//             {data.map((item) => (
+//               <tr key={item.id}>
+//                 <td>
+//                   <input
+//                     type="checkbox"
+//                     checked={selectedItems.indexOf(item.id) !== -1}
+//                     onChange={() => handleCheckboxChange(item.id)}
+//                   />
+//                 </td>
+//                 <td>{item.namaProduct}</td>
+//                 <td>{item.address}</td>
+//                 <td>{item.contact}</td>
+//                 <td>{item.packaging}</td>
+//                 <td>{item.stock}</td>
+//                 <td>{item.totalHarga}</td>
+//                 <td>{item.deliveryDate}</td>
+//                 <td>{item.status}</td>
+//                 <td>{item.timestamp?.toDate().toString()}</td>
+//               </tr>
+//             ))}
+//           </tbody>
+//         </table>
+//       </div>
+//       <div className="w-[90%] mx-auto mt-10">
+//         <h2 className="text-2xl font-semibold mb-5">Proses Kirim Ke Gudang</h2>
+//         <form onSubmit={handleSendToGudang}>
+//           {/* Tampilkan item yang dipilih di sini */}
+//           {selectedItems.length > 0 && (
+//             <div className="mb-5">
+//               <h3 className="text-xl font-semibold mb-2">Pilih Pesanan:</h3>
+//               <ul>
+//                 {selectedItems.map((itemId) => {
+//                   const selectedData = data.find((item) => item.id === itemId);
+//                   if (selectedData) {
+//                     return (
+//                       <li key={selectedData.id}>
+//                         <p>Nama Beras: {selectedData.namaProduct}</p>
+//                         <p>Alamat Pengiriman: {selectedData.address}</p>
+//                         <p>Kontak: {selectedData.contact}</p>
+//                         <p>Kategori Kemasan: {selectedData.packaging}</p>
+//                         <p>Jumlah Kemasan: {selectedData.stock}</p>
+//                         <p>Tanggal Pemesanan: {selectedData.timestamp?.toDate().toString()}</p>
+//                       </li>
+//                     );
+//                   }
+//                   return null;
+//                 })}
+//               </ul>
+//             </div>
+//           )}
+//           <div className="modal-action">
+//             <button className="btn btn-primary" type="submit">
+//               Kirim Ke Gudang
+//             </button>
+//           </div>
+//         </form>
+//       </div>
+//       <Footer />
+//     </div>
+//   );
+// };
+
+// export default Purchase;
+
+
 
 "use client";
-import useAuth from "@/app/hooks/useAuth";
-import Footer from "@/components/Footer";
-import Navbar from "@/components/Navbar";
-import NavbarAdmin from "@/components/NavbarAdmin";
-import { db, storage } from "@/firebase/firebase";
-import {
-  collection,
-  doc,
-  onSnapshot,
-  serverTimestamp,
-  setDoc,
-  updateDoc,
-  query,
-  where,
-  getDocs,
-} from "firebase/firestore";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { collection, doc, onSnapshot, updateDoc, getDoc, addDoc, query, orderBy } from "firebase/firestore";
+import { db } from "@/firebase/firebase";
+import useAuth from "@/app/hooks/useAuth";
+import NavbarGudang from "@/components/NavbarGudang";
+import Footer from "@/components/Footer";
+import { useRouter } from "next/navigation"; // import useRouter from next/router
+import NavbarAdmin from "@/components/NavbarAdmin";
 
 const Purchase = () => {
-  const { user, userProfile } = useAuth();
-  const router = useRouter();
+    const { user, userProfile } = useAuth();
+    const [dataPembelian, setDataPembelian] = useState([]);
+    const [dataRequestOrder, setDataRequestOrder] = useState([]);
+    const [dataRelasi, setDataRelasi] = useState([]);
+    const [selectedItems, setSelectedItems] = useState([]);
+    const [nominalInput, setNominalInput] = useState("");
+    const [deliveryData, setDeliveryData] = useState([]);
+    const router = useRouter(); // initialize router
 
-  useEffect(() => {
-    if (user && userProfile.role === "user") {
-      router.push("/");
-    }
-  }, [user, userProfile, router]);
+    useEffect(() => {
+        if (user && userProfile.role === "user") {
+            router.push("/");
+        }
+    }, [user, userProfile]);
 
-  const [file, setFile] = useState(null);
-  const [percentage, setPercentage] = useState(null);
-  const [data, setData] = useState([]);
-  const [namaProduct, setNamaProduct] = useState(""); // State untuk nama produk
-  const [address, setAddress] = useState(""); // State untuk alamat pengiriman
-  const [selectedItems, setSelectedItems] = useState([]); // State untuk menyimpan item yang dipilih
-
-  useEffect(() => {
-    const unsub = onSnapshot(
-      collection(db, "userRequestOrder"),
-      (snapshot) => {
-        let list = [];
-        snapshot.docs.forEach((doc) => {
-          list.push({ id: doc.id, ref: doc.ref, ...doc.data() });
+    useEffect(() => {
+        const unsubscribePembelian = onSnapshot(collection(db, "userPembelian"), (snapshot) => {
+            const pembelianData = snapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setDataPembelian(pembelianData);
         });
-        setData(list);
 
-        // Set nilai awal untuk nama produk dan alamat berdasarkan data pertama dari snapshot
-        if (list.length > 0) {
-          setNamaProduct(list[0].namaProduct || ""); // Mengambil nilai nama produk
-          setAddress(list[0].address || ""); // Mengambil nilai alamat pengiriman
+        const unsubscribeRequestOrder = onSnapshot(collection(db, "userRequestOrder"), (snapshot) => {
+            const requestOrderData = snapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setDataRequestOrder(requestOrderData);
+        });
+
+        const unsubscribeRelasi = onSnapshot(collection(db, "userRelasi"), (snapshot) => {
+            const relasiData = snapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setDataRelasi(relasiData);
+        });
+
+        const q = query(collection(db, "userDelivery"), orderBy("createdAt", "desc"));
+        const unsubscribeDelivery = onSnapshot(q, (snapshot) => {
+            const deliveryData = snapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setDeliveryData(deliveryData);
+        });
+
+        return () => {
+            unsubscribePembelian();
+            unsubscribeRequestOrder();
+            unsubscribeRelasi();
+            unsubscribeDelivery();
+        };
+    }, []);
+
+    const handleCheckboxChange = (itemId, type) => {
+        const selectedIndex = selectedItems.findIndex((item) => item.id === itemId && item.type === type);
+        let newSelected = [];
+
+        if (selectedIndex === -1) {
+            newSelected = newSelected.concat(selectedItems, { id: itemId, type });
+        } else if (selectedIndex === 0) {
+            newSelected = newSelected.concat(selectedItems.slice(1));
+        } else if (selectedIndex === selectedItems.length - 1) {
+            newSelected = newSelected.concat(selectedItems.slice(0, -1));
+        } else if (selectedIndex > 0) {
+            newSelected = newSelected.concat(selectedItems.slice(0, selectedIndex), selectedItems.slice(selectedIndex + 1));
         }
-      },
-      (error) => {
-        console.log(error);
-      }
-    );
 
-    return () => {
-      unsub();
+        setSelectedItems(newSelected);
     };
-  }, []);
 
-  const handleCheckboxChange = (itemId) => {
-    const selectedIndex = selectedItems.indexOf(itemId);
-    let newSelected = [];
+    const handleProcess = (e) => {
+        e.preventDefault();
 
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selectedItems, itemId);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selectedItems.slice(1));
-    } else if (selectedIndex === selectedItems.length - 1) {
-      newSelected = newSelected.concat(selectedItems.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selectedItems.slice(0, selectedIndex),
-        selectedItems.slice(selectedIndex + 1)
-      );
-    }
+        const nominal = selectedItems
+            .filter(item => item.type === "relasi")
+            .map(item => {
+                const selectedData = dataRelasi.find(data => data.id === item.id);
+                return selectedData ? selectedData.stock : Infinity;
+            })
+            .reduce((min, stock) => Math.min(min, stock), Infinity);
 
-    setSelectedItems(newSelected);
-  };
+        setNominalInput(nominal === Infinity ? "" : nominal);
 
-  const handleSendToGudang = async (e) => {
-    e.preventDefault();
+        const modal = document.getElementById("combinedForm");
+        modal.showModal();
+    };
 
-    try {
-      // Update status for selected items
-      for (const itemId of selectedItems) {
-        const selectedData = data.find((item) => item.id === itemId);
+    const handleSelesai = async () => {
+        try {
+            const requestOrderUpdates = selectedItems
+                .filter(item => item.type === "relasi")
+                .map(async (selectedItem) => {
+                    const itemRef = doc(db, "userRelasi", selectedItem.id);
+                    const itemDoc = await getDoc(itemRef);
 
-        if (selectedData) {
-          await updateDoc(selectedData.ref, {
-            status: "pengecekan stock",
-          });
+                    if (itemDoc.exists()) {
+                        const { status, deliveryDate } = itemDoc.data();
+
+                        if (status === "dikirim") {
+                            requestOrderUpdates.push(updateDoc(itemRef, { status: "diproses" }));
+                        }
+                        if (deliveryDate) {
+                            const currentDate = new Date(deliveryDate);
+                            currentDate.setMonth(currentDate.getMonth() + 1);
+                            const newDeliveryDate = currentDate.toISOString().split("T")[0];
+                            requestOrderUpdates.push(updateDoc(itemRef, { deliveryDate: newDeliveryDate }));
+                        }
+                    }
+                });
+
+            await Promise.all(requestOrderUpdates);
+
+            alert("Status berhasil diperbarui menjadi 'Diproses'!");
+        } catch (error) {
+            console.error("Error updating status:", error);
         }
-      }
+    };
 
-      alert("Status updated to pengecekan stock!");
-      setSelectedItems([]);
-    } catch (error) {
-      console.error("Error updating status:", error);
-    }
-  };
+    const handleStockReduction = async () => {
+        try {
+            if (!nominalInput) {
+                alert("Masukkan nominal untuk pengurangan stock.");
+                return;
+            }
 
-  return (
-    <div className="w-[100%] mx-auto mt-32">
-      <NavbarAdmin />
-      <div className="w-[90%] mx-auto mt-10">
-        <h2 className="text-2xl font-semibold mb-4">Pesanan</h2>
-        <table className="table-auto w-full">
-          <thead>
-            <tr>
-              <th>Pilih</th>
-              <th>Nama Beras</th>
-              <th>Alamat Pengiriman</th>
-              <th>Kontak</th>
-              <th>Kategori Kemasan</th>
-              <th>Jumlah Kemasan</th>
-              <th>Harga</th>
-              <th>Tanggal Kirim</th>
-              <th>Status</th>
-              <th>Tanggal Pemesanan</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((item) => (
-              <tr key={item.id}>
-                <td>
-                  <input
-                    type="checkbox"
-                    checked={selectedItems.indexOf(item.id) !== -1}
-                    onChange={() => handleCheckboxChange(item.id)}
-                  />
-                </td>
-                <td>{item.namaProduct}</td>
-                <td>{item.address}</td>
-                <td>{item.contact}</td>
-                <td>{item.packaging}</td>
-                <td>{item.stock}</td>
-                <td>{item.totalHarga}</td>
-                <td>{item.deliveryDate}</td>
-                <td>{item.status}</td>
-                <td>{item.timestamp?.toDate().toString()}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="w-[90%] mx-auto mt-10">
-        <h2 className="text-2xl font-semibold mb-5">Proses Kirim Ke Gudang</h2>
-        <form onSubmit={handleSendToGudang}>
-          {/* Tampilkan item yang dipilih di sini */}
-          {selectedItems.length > 0 && (
-            <div className="mb-5">
-              <h3 className="text-xl font-semibold mb-2">Pilih Pesanan:</h3>
-              <ul>
-                {selectedItems.map((itemId) => {
-                  const selectedData = data.find((item) => item.id === itemId);
-                  if (selectedData) {
-                    return (
-                      <li key={selectedData.id}>
-                        <p>Nama Beras: {selectedData.namaProduct}</p>
-                        <p>Alamat Pengiriman: {selectedData.address}</p>
-                        <p>Kontak: {selectedData.contact}</p>
-                        <p>Kategori Kemasan: {selectedData.packaging}</p>
-                        <p>Jumlah Kemasan: {selectedData.stock}</p>
-                        <p>Tanggal Pemesanan: {selectedData.timestamp?.toDate().toString()}</p>
-                      </li>
-                    );
-                  }
-                  return null;
-                })}
-              </ul>
+            const nominal = parseInt(nominalInput);
+
+            const pembelianUpdates = [];
+            const requestOrderUpdates = [];
+            const relasiUpdates = [];
+
+            for (const selectedItem of selectedItems) {
+                const { id, type } = selectedItem;
+
+                if (type === "pembelian") {
+                    const itemRef = doc(db, "userPembelian", id);
+                    const itemDoc = await getDoc(itemRef);
+
+                    if (itemDoc.exists()) {
+                        const { stock } = itemDoc.data();
+
+                        if (stock >= nominal) {
+                            const newStock = stock - nominal;
+                            pembelianUpdates.push(updateDoc(itemRef, { stock: newStock }));
+                        } else {
+                            alert(`Stock tidak mencukupi untuk item ${id}`);
+                            return;
+                        }
+                    }
+                } else if (type === "relasi") {
+                    const itemRef = doc(db, "userRelasi", id);
+                    const itemDoc = await getDoc(itemRef);
+
+                    if (itemDoc.exists()) {
+                        const { status } = itemDoc.data();
+
+                        if (status === "diproses") {
+                            requestOrderUpdates.push(updateDoc(itemRef, { status: "dikirim" }));
+                        }
+                    }
+                }
+            }
+
+            // Perform stock reduction for pembelian items
+            await Promise.all(pembelianUpdates);
+
+            // Perform status update for request order items
+            await Promise.all(requestOrderUpdates);
+
+            // Perform delivery date update for relasi items
+            await Promise.all(relasiUpdates);
+
+            // Create invoice from selected items
+            const invoiceData = selectedItems.map((selectedItem) => {
+                const { id, type } = selectedItem;
+                if (type === "pembelian") {
+                    return dataPembelian.find((item) => item.id === id);
+                } else if (type === "relasi") {
+                    return dataRelasi.find((item) => item.id === id);
+                }
+                return null;
+            }).filter(item => item !== null);
+
+            await addDoc(collection(db, "userDelivery"), {
+                items: invoiceData,
+                createdAt: new Date()
+            });
+
+            alert("Pengurangan stock berhasil dilakukan dan invoice berhasil dibuat!");
+            document.getElementById("combinedForm").close();
+            setSelectedItems([]);
+            setNominalInput("");
+        } catch (error) {
+            console.error("Error reducing stock:", error);
+        }
+    };
+
+    const handleDeliver = async (deliveryId) => {
+        try {
+            const deliveryDoc = await getDoc(doc(db, "userDelivery", deliveryId));
+            if (deliveryDoc.exists()) {
+                const deliveryItems = deliveryDoc.data().items;
+
+                const updatedItems = deliveryItems.map((item) => {
+                    if (item.statusDelivery === "siap dikirim") {
+                        return { ...item, statusDelivery: "dikirim" };
+                    }
+                    return item;
+                });
+
+                await updateDoc(doc(db, "userDelivery", deliveryId), { items: updatedItems });
+                alert("Status berhasil diperbarui menjadi 'dikirim'!");
+            } else {
+                console.error(`No delivery document found for ID: ${deliveryId}`);
+            }
+        } catch (error) {
+            console.error("Error updating delivery status:", error);
+        }
+    };
+
+    const groupOrdersByField = (orders, field) => {
+        const groupedOrders = {};
+        orders.forEach((order) => {
+            if (!groupedOrders[order[field]]) {
+                groupedOrders[order[field]] = [];
+            }
+            groupedOrders[order[field]].push(order);
+        });
+        return groupedOrders;
+    };
+
+    return (
+        <div className="w-full mx-auto h-12 mt-10">
+            <NavbarAdmin />
+
+            {/* Section to display the created delivery */}
+            <div className="w-[90%] mx-auto mt-10">
+                <h2 className="text-2xl font-semibold mb-5">Delivery Details</h2>
+                <div className="border p-4 rounded-md">
+                    {deliveryData.length > 0 ? (
+                        deliveryData.map((delivery, index) => (
+                            <div key={index} className="mb-4">
+                                <h4 className="text-xl font-semibold">Invoice {index + 1}</h4>
+                                {delivery.items.map((item, idx) => (
+                                    <div key={idx} className="mb-4">
+                                        <p>Nama: {item.itemName || item.fullName}</p>
+                                        <p>Kategori Kemasan: {item.packaging}</p>
+                                        <p>Jumlah Kemasan: {item.stock}</p>
+                                        <p>Status: {item.statusDelivery}</p>
+                                        {item.image && <img src={item.image} alt="Payment Proof" className="h-52 w-auto mt-2 mx-auto" />}
+                                        <p>Alamat: {item.address}</p>
+                                        <p>Kontak: {item.contact}</p>
+                                    </div>
+                                ))}
+                                <button className="btn btn-primary" onClick={() => handleDeliver(delivery.id)}>
+                                    Deliver
+                                </button>
+                            </div>
+                        ))
+                    ) : (
+                        <p>No delivery data to display.</p>
+                    )}
+                </div>
             </div>
-          )}
-          <div className="modal-action">
-            <button className="btn btn-primary" type="submit">
-              Kirim Ke Gudang
-            </button>
-          </div>
-        </form>
-      </div>
-      <Footer />
-    </div>
-  );
+
+            <Footer />
+        </div>
+    );
 };
 
 export default Purchase;
+
+
+
 
 
 

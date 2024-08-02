@@ -14,7 +14,9 @@ const Admin = () => {
   useEffect(() => {
     if (user && userProfile.role === "user") {
       router.push("/");
-    } else if (user && userProfile.role === "admin") {
+    } else if (user && userProfile.role === "delivery") {
+      router.push("/delivery");
+    }else if (user && userProfile.role === "admin") {
       // Jika user adalah admin, kita dapat menampilkan alert selamat datang
       // dan menampilkan nama admin dari userProfile
       alert("Selamat datang, " + userProfile.name);

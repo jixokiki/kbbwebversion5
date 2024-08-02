@@ -4,7 +4,7 @@ import Link from "next/link";
 import React, { useState } from "react";
 import { FaBars } from "react-icons/fa6";
 
-const NavbarAdmin = () => {
+const NavbarDelivery = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -15,72 +15,64 @@ const NavbarAdmin = () => {
   return (
     <>
       <nav className="bg-white flex justify-between items-center px-4 md:px-8 w-full md:w-11/12 h-20 shadow-md mx-auto rounded-none md:rounded-2xl border fixed top-0 md:top-5 left-1/2 -translate-x-1/2 z-40">
-        <h1 className="text-3xl font-bold text-gray-900">MARKETING</h1>
+        <h1 className="text-3xl font-bold text-gray-900">DELIVERY</h1>
         <div className="block md:hidden" onClick={toggleMenu}>
           <FaBars size={35} />
         </div>
         <ul className={`text-lg font-semibold text-gray-900 hidden md:flex`}>
           <li className="md:mr-3">
             <Link
-              href={"/admin"}
+              href={"/delivery"}
               className="px-4 py-3  transition-all duration-300 hover:bg-teal-500 hover:text-white rounded"
             >
               Halaman Utama
             </Link>
           </li>
-          <li className="md:mr-3">
-            <Link
-              href={"/admin/products"}
-              className="px-4 py-3  transition-all duration-300 hover:bg-teal-500 hover:text-white rounded"
-            >
-              Pesanan
-            </Link>
-          </li>
-          <li className="md:mr-3">
-            <Link
-              href={"/admin/desain"}
-              className="px-4 py-3  transition-all duration-300 hover:bg-teal-500 hover:text-white rounded"
-            >
-              Harga Beras
-            </Link>
-          </li>
           {/* <li className="md:mr-3">
             <Link
-              href={"/admin/payments"}
-              className="px-4 py-3  transition-all duration-300 hover:bg-teal-500 hover:text-white rounded"
+              href={"/gudang/desain"}
+              className="px-14 py-3  transition-all duration-300 hover:bg-teal-500 hover:text-white rounded"
             >
-              Bukti Pembayaran
+              Pesanan
             </Link>
           </li> */}
           <li className="md:mr-3">
             <Link
-              href={"/admin/upload"}
-              className="px-4 py-3  transition-all duration-300 hover:bg-teal-500 hover:text-white rounded"
+              href={"/delivery/payments"}
+              className="px-14 py-3  transition-all duration-300 hover:bg-teal-500 hover:text-white rounded"
             >
-              Relasi
+              Bukti Pembayaran
             </Link>
           </li>
           <li className="md:mr-3">
             <Link
-              href={"/admin/services"}
-              className="px-4 py-3  transition-all duration-300 hover:bg-teal-500 hover:text-white rounded"
+              href={"/delivery/products"}
+              className="px-14 py-3  transition-all duration-300 hover:bg-teal-500 hover:text-white rounded"
             >
-              Kerjasama
+              Stok Beras
             </Link>
           </li>
-          <li className="md:mr-3">
+          {/* <li className="md:mr-3">
             <Link
-              href={"/admin/users"}
+              href={"/gudang/services"}
+              className="px-4 py-3  transition-all duration-300 hover:bg-teal-500 hover:text-white rounded"
+            >
+              Service
+            </Link>
+          </li> */}
+          {/* <li className="md:mr-3">
+            <Link
+              href={"/gudang/users"}
               className="px-4 py-3  transition-all duration-300 hover:bg-teal-500 hover:text-white rounded"
             >
               Users
             </Link>
-          </li>
+          </li> */}
           <li>
             <Link
               href={"/sign-in"}
               onClick={handleLogout}
-              className="px-4 py-3 transition-all duration-500 bg-teal-500 text-white hover:bg-teal-800 rounded hover:text-white"
+              className="px-10 py-3 transition-all duration-500 bg-teal-500 text-white hover:bg-teal-800 rounded hover:text-white"
             >
               Keluar
             </Link>
@@ -141,4 +133,4 @@ const NavbarAdmin = () => {
   );
 };
 
-export default NavbarAdmin;
+export default NavbarDelivery;

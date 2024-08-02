@@ -72,6 +72,8 @@ export default function Home() {
       router.push("/admin");
     } else if (user && userProfile.role === "gudang") {
       router.push("/gudang");
+    }else if (user && userProfile.role === "delivery") {
+      router.push("/delivery");
     } else if (user && userProfile.role === "user") {
       // If the user is an admin, we can display a welcome alert
       // and show the admin's name from userProfile

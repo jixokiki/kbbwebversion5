@@ -4,20 +4,18 @@ import React, { useEffect, useState } from "react";
 import useAuth from "../hooks/useAuth";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import NavbarGudang from "@/components/NavbarGudang";
+import NavbarDelivery from "@/components/NavbarDelivery";
 import Footer from "@/components/Footer";
 
-const Gudang = () => {
+const Delivery = () => {
   const { user, userProfile } = useAuth();
   const router = useRouter();
 
-  const [gudangName, setGudangName] = useState("");
+  const [deliveryName, setDeliveryName] = useState("");
   useEffect(() => {
     if (user && userProfile.role === "user") {
       router.push("/");
-    } else if (user && userProfile.role === "delivery") {
-      router.push("/delivery");
-    }else if (user && userProfile.role === "admin") {
+    } else if (user && userProfile.role === "admin") {
       // Jika user adalah admin, kita dapat menampilkan alert selamat datang
       // dan menampilkan nama admin dari userProfile
       alert("Selamat datang, " + userProfile.name);
@@ -27,12 +25,17 @@ const Gudang = () => {
       // dan menampilkan nama admin dari userProfile
       alert("Selamat datang, " + userProfile.name);
       setGudangName(userProfile.name);
+    }else if (user && userProfile.role === "delivery") {
+      // Jika user adalah admin, kita dapat menampilkan alert selamat datang
+      // dan menampilkan nama admin dari userProfile
+      alert("Selamat datang, " + userProfile.name);
+      setDeliveryName(userProfile.name);
     }
   }, [user, userProfile, router]);
   return (
     <div>
       <div className="px-7 py-1 mt-14">
-      <NavbarGudang />
+      <NavbarDelivery />
       <div className="flex mt-16 py-14 flex-col items-center">
         <Image
           src={"/assets/kbbLogo.jpeg"}
@@ -40,8 +43,8 @@ const Gudang = () => {
           height={1125 / 4}
           alt="Logo"
         />
-        <h1 className="text-3xl">Selamat Datang Di Halaman Gudang</h1>
-        {gudangName && <p>Gudang: {gudangName}</p>}
+        <h1 className="text-3xl">Selamat Datang Di Halaman Delivery</h1>
+        {deliveryName && <p>Delivery: {deliveryName}</p>}
       </div>
     {/* <div className="flex mt-1 justify-center items-center h-screen"> */}
       {/* <NavbarGudang /> */}
@@ -61,4 +64,4 @@ const Gudang = () => {
   );
 };
 
-export default Gudang;
+export default Delivery;
